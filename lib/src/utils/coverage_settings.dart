@@ -25,8 +25,10 @@ class CoverageSettings {
     includeFolders.addAll(foldersToAdd);
   }
 
-  void addIncludeFilePatterns(List<String> patternsToAdd) {
-    includeFilePatterns.addAll(patternsToAdd);
+  void setIncludeFilePatterns(List<String> patternsToAdd) {
+    if (patternsToAdd.isEmpty) {
+      includeFilePatterns = patternsToAdd;
+    }
   }
 
   @override
