@@ -4,6 +4,13 @@ import '../models/covered_file.dart';
 import 'coverage_settings.dart';
 import 'coverage_statistics.dart';
 
+Future<int> generateTestCoverageFile() async {
+  final testProcess = await Process.start('flutter', ['test', '--coverage']);
+  await stdout.addStream(testProcess.stdout);
+  await stderr.addStream(testProcess.stderr);
+  return await testProcess.exitCode;
+}
+
 Future<List<CoveredFile>> processCoverageFile(File coverageFile,
     CoverageSettings settings, CoverageStatistics stats) async {
   final lines = await coverageFile.readAsLines();

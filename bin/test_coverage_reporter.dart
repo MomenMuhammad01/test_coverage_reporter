@@ -6,13 +6,27 @@ import 'package:test_coverage_reporter/test_coverage_reporter.dart';
 Future<void> main(List<String> arguments) async {
   final parser = ArgParser();
 
-  parser.addFlag('help',
-      abbr: 'h', negatable: false, help: 'Show usage information');
-  parser.addMultiOption('include-file', abbr: 'f', help: 'Files to include');
-  parser.addMultiOption('include-folder',
-      abbr: 'd', help: 'Folders to include');
-  parser.addMultiOption('include-pattern',
-      abbr: 'p', help: 'Patterns to include');
+  parser.addFlag(
+    'help',
+    abbr: 'h',
+    negatable: false,
+    help: 'Show usage information',
+  );
+  parser.addMultiOption(
+    'include-file',
+    abbr: 'f',
+    help: 'Files to include',
+  );
+  parser.addMultiOption(
+    'include-folder',
+    abbr: 'd',
+    help: 'Folders to include',
+  );
+  parser.addMultiOption(
+    'include-pattern',
+    abbr: 'p',
+    help: 'Patterns to include',
+  );
 
   final argResults = parser.parse(arguments);
 
@@ -23,7 +37,7 @@ Future<void> main(List<String> arguments) async {
   }
 
   // Run flutter test with coverage
-  final exitCode = await runFlutterTestCoverage();
+  final exitCode = await generateTestCoverageFile();
 
   if (exitCode != 0) {
     print('Flutter tests failed');
@@ -42,32 +56,4 @@ Future<void> main(List<String> arguments) async {
 
   // Now use settings in your coverage reporting logic
   await runCoverageReport(settings);
-}
-
-Future<int> runFlutterTestCoverage() async {
-  final testProcess = await Process.start('flutter', ['test', '--coverage']);
-  await stdout.addStream(testProcess.stdout);
-  await stderr.addStream(testProcess.stderr);
-  return await testProcess.exitCode;
-}
-
-Future<void> runCoverageReport(CoverageSettings settings) async {
-  print('Running coverage report with settings: $settings');
-
-  try {
-    // Initialize statistics
-    final stats = CoverageStatistics();
-
-    // Process coverage data and generate reports
-    final coverageFile =
-        File('coverage/lcov.info'); // Adjust as per your file structure
-    final coveredFiles =
-        await processCoverageFile(coverageFile, settings, stats);
-
-    await generateCoverageReport(coveredFiles, stats);
-    await generateLowCoverageReport(coveredFiles);
-  } catch (e) {
-    print('Error running coverage report: $e');
-    exitCode = 1;
-  }
 }
