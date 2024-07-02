@@ -27,14 +27,10 @@ Future<void> main(List<String> arguments) async {
   final includeFilePatterns = argResults['include-pattern'] as List<String>;
 
   final settings = CoverageSettings(
-    includeFiles: [],
-    includeFolders: [],
+    includeFilePatterns: includeFilePatterns,
+    includeFiles: includeFiles,
+    includeFolders: includeFolders,
   );
-
-  // Now merge command-line arguments with existing lists
-  settings.addIncludeFiles(includeFiles);
-  settings.addIncludeFolders(includeFolders);
-  settings.addIncludeFilePatterns(includeFilePatterns);
 
   // Now use settings in your coverage reporting logic
   await runCoverageReport(settings);
