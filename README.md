@@ -1,39 +1,49 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Test Coverage Reporter
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+Test Coverage Reporter is a Dart package for generating custom coverage reports based on `lcov.info` files produced by Flutter tests. It allows you to specify which files, folders, or patterns to include in the coverage report, providing flexibility in customizing your coverage analysis .
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
+## Installation
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+### Direct GitHub Dependency
 
-## Features
+You Must Add Test Coverage Reporter directly from GitHub, add the following to your `pubspec.yaml`:
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+```yaml
+dependencies:
+  test_coverage_reporter:
+    git:
+      url: https://github.com/MomenMuhammad01/test_coverage_reporter.git
+ ```
 
 ## Usage
+Command-Line Options
+Run the package from the command line with the following options:
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+--include-file <file>: Include specific files in the coverage report.
+--include-folder <folder>: Include specific folders in the coverage report.
+--include-pattern <pattern>: Include files matching specific patterns in the coverage report.
 
-```dart
-const like = 'sample';
+### Examples
+Example 1: Generate coverage report with default file ending patterns ['_usecase.dart', _repository.dart, impl.dart,_cubit.dart, _bloc.dart _source.dart, _api.dart]
+ ```
+dart run test_coverage_reporter 
 ```
 
-## Additional information
+Example 2: Generate coverage report including specific files
+ ```
+dart run test_coverage_reporter --include-file lib/main.dart lib/utils.dart
+```
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+Example 3: Generate coverage report including a folder
+ ```
+dart run test_coverage_reporter --include-folder lib
+```
+
+Example 4: Generate coverage report including files matching a pattern
+ ```
+dart run test_coverage_reporter --include-pattern _util.dart
+```
+
+## Output
+The package generates a coverage report (coverage_report.txt and low_coverage_files_report.txt) in main project directory.
+
