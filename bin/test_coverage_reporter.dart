@@ -22,6 +22,14 @@ Future<void> main(List<String> arguments) async {
     return;
   }
 
+  // Run flutter test with coverage
+  final exitCode = await runFlutterTestCoverage();
+
+  if (exitCode != 0) {
+    print('Flutter tests failed');
+    exit(exitCode);
+  }
+
   final includeFiles = argResults['include-file'] as List<String>;
   final includeFolders = argResults['include-folder'] as List<String>;
   final includeFilePatterns = argResults['include-pattern'] as List<String>;
@@ -31,8 +39,16 @@ Future<void> main(List<String> arguments) async {
     includeFolders: includeFolders,
   );
   settings.setIncludeFilePatterns(includeFilePatterns);
+
   // Now use settings in your coverage reporting logic
   await runCoverageReport(settings);
+}
+
+Future<int> runFlutterTestCoverage() async {
+  final testProcess = await Process.start('flutter', ['test', '--coverage']);
+  await stdout.addStream(testProcess.stdout);
+  await stderr.addStream(testProcess.stderr);
+  return await testProcess.exitCode;
 }
 
 Future<void> runCoverageReport(CoverageSettings settings) async {
