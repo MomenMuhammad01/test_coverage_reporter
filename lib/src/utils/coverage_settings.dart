@@ -26,7 +26,7 @@ class CoverageSettings {
   }
 
   void setIncludeFilePatterns(List<String> patternsToAdd) {
-    if (patternsToAdd.isEmpty) {
+    if (patternsToAdd.isNotEmpty) {
       includeFilePatterns = patternsToAdd;
     }
   }
