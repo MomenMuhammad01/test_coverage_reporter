@@ -5,7 +5,8 @@ import 'coverage_settings.dart';
 import 'coverage_statistics.dart';
 
 Future<int> generateTestCoverageFile() async {
-  final testProcess = await Process.start('flutter', ['test', '--coverage']);
+  final testProcess = await Process.start(
+      'flutter', ['test', '--coverage', '--dart-define=test=true']);
   await stdout.addStream(testProcess.stdout);
   await stderr.addStream(testProcess.stderr);
   return await testProcess.exitCode;
