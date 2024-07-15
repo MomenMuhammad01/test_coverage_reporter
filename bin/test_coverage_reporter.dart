@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:args/args.dart';
 import 'package:test_coverage_reporter/test_coverage_reporter.dart';
 
@@ -37,23 +35,24 @@ Future<void> main(List<String> arguments) async {
   }
 
   // Run flutter test with coverage
-  final exitCode = await generateTestCoverageFile();
+  final outputBuffer = StringBuffer();
 
-  if (exitCode != 0) {
-    print('Flutter tests failed');
-    exit(exitCode);
+  final exitCode = await generateTestCoverageFile(outputBuffer);
+
+  if (outputBuffer.isEmpty) {
+    final includeFiles = argResults['include-file'] as List<String>;
+    final includeFolders = argResults['include-folder'] as List<String>;
+    final includeFilePatterns = argResults['include-pattern'] as List<String>;
+
+    final settings = CoverageSettings(
+      includeFiles: includeFiles,
+      includeFolders: includeFolders,
+    );
+    settings.setIncludeFilePatterns(includeFilePatterns);
+
+    // Now use settings in your coverage reporting logic
+    await runCoverageReport(settings);
+  } else {
+    await generateErrorReport(outputBuffer);
   }
-
-  final includeFiles = argResults['include-file'] as List<String>;
-  final includeFolders = argResults['include-folder'] as List<String>;
-  final includeFilePatterns = argResults['include-pattern'] as List<String>;
-
-  final settings = CoverageSettings(
-    includeFiles: includeFiles,
-    includeFolders: includeFolders,
-  );
-  settings.setIncludeFilePatterns(includeFilePatterns);
-
-  // Now use settings in your coverage reporting logic
-  await runCoverageReport(settings);
 }

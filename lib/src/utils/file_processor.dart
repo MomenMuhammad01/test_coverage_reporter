@@ -1,15 +1,33 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import '../models/covered_file.dart';
 import 'coverage_settings.dart';
 import 'coverage_statistics.dart';
 
-Future<int> generateTestCoverageFile() async {
+Future<int> generateTestCoverageFile(StringBuffer outputBuffer) async {
   final testProcess = await Process.start(
       'flutter', ['test', '--coverage', '--dart-define=test=true']);
-  await stdout.addStream(testProcess.stdout);
-  await stderr.addStream(testProcess.stderr);
-  return await testProcess.exitCode;
+
+  // Use a Completer to wait for both streams to complete
+  final completer = Completer<void>();
+
+  testProcess.stdout.transform(utf8.decoder).listen((data) {
+    if (data.contains('[E]') ||
+        data.contains('Expected:') ||
+        data.contains('Actual:')) {
+      outputBuffer.write(data);
+    }
+  }, onDone: () {
+    completer.complete();
+  });
+
+  // Wait for both streams to complete
+  await completer.future;
+
+  final exitCode = await testProcess.exitCode;
+  return exitCode;
 }
 
 Future<List<CoveredFile>> processCoverageFile(File coverageFile,
