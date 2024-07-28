@@ -6,9 +6,10 @@ import '../models/covered_file.dart';
 import 'coverage_settings.dart';
 import 'coverage_statistics.dart';
 
-Future<int> generateTestCoverageFile(StringBuffer outputBuffer) async {
-  final testProcess = await Process.start(
-      'flutter', ['test', '--coverage', '--dart-define=test=true']);
+Future<int> generateTestCoverageFile(
+    StringBuffer outputBuffer, List<String>? flutterPath) async {
+  final testProcess = await Process.start(flutterPath?[0] ?? 'flutter',
+      ['test', '--coverage', '--dart-define=test=true']);
 
   // Use a Completer to wait for both streams to complete
   final completer = Completer<void>();

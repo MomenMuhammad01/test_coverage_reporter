@@ -25,6 +25,11 @@ Future<void> main(List<String> arguments) async {
     abbr: 'p',
     help: 'Patterns to include',
   );
+  parser.addMultiOption(
+    'flutter-path',
+    abbr: 'l',
+    help: 'Set custom flutter path to run command',
+  );
 
   final argResults = parser.parse(arguments);
 
@@ -33,11 +38,12 @@ Future<void> main(List<String> arguments) async {
     print(parser.usage);
     return;
   }
+  final setFlutterPath = argResults['flutter-path'] as List<String>?;
 
   // Run flutter test with coverage
   final outputBuffer = StringBuffer();
 
-  final exitCode = await generateTestCoverageFile(outputBuffer);
+  final exitCode = await generateTestCoverageFile(outputBuffer, setFlutterPath);
 
   if (outputBuffer.isEmpty) {
     final includeFiles = argResults['include-file'] as List<String>;
