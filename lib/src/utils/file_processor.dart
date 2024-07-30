@@ -22,7 +22,7 @@ Future<int> generateTestCoverageFile(
   try {
     final testProcess = await Process.start(
       flutterExecutable,
-      ['test', '--coverage', '--dart-define=test=true'],
+      ['test', '--coverage', '--dart-define=test=1'],
     );
 
     // Use a Completer to wait for both streams to complete
