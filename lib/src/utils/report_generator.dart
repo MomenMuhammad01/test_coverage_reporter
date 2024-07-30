@@ -18,6 +18,10 @@ Future<void> runCoverageReport(CoverageSettings settings) async {
       settings,
       stats,
     );
+
+    // Ensure the reports directory exists
+    await ensureDirectoryExists("reports");
+
     await generateCoverageReport(coveredFiles, stats);
     await generateLowCoverageReport(coveredFiles);
   } catch (e) {
@@ -26,13 +30,19 @@ Future<void> runCoverageReport(CoverageSettings settings) async {
   }
 }
 
+Future<void> ensureDirectoryExists(String path) async {
+  final directory = Directory(path);
+  if (!await directory.exists()) {
+    await directory.create(recursive: true);
+  }
+}
+
 Future<void> generateCoverageReport(
     List<CoveredFile> coveredFiles, CoverageStatistics stats) async {
   final totalCoverage = stats.totalLines > 0
       ? (stats.totalCoveredLines / stats.totalLines) * 100
       : 0.0;
-
-  final reportFile = File('coverage_report.txt');
+  final reportFile = File('reports/coverage_report.txt');
   final reportLines = <String>[
     'Test Coverage Report',
     '======================',
@@ -53,7 +63,7 @@ Future<void> generateCoverageReport(
 
   await reportFile.writeAsString(reportLines.join('\n'));
 
-  print('Coverage report generated at coverage_report.txt');
+  print('Coverage report generated at reports/coverage_report.txt');
 }
 
 Future<void> generateLowCoverageReport(List<CoveredFile> coveredFiles) async {
@@ -61,7 +71,7 @@ Future<void> generateLowCoverageReport(List<CoveredFile> coveredFiles) async {
       coveredFiles.where((file) => file.coverage < 75.0).toList();
   lowCoverageFiles.sort((a, b) => a.coverage.compareTo(b.coverage));
 
-  final reportFile = File('low_coverage_files_report.txt');
+  final reportFile = File('reports/low_coverage_files_report.txt');
   final reportLines = <String>[
     'Low Coverage Files Report (< 75%)',
     '=================================',
@@ -70,7 +80,9 @@ Future<void> generateLowCoverageReport(List<CoveredFile> coveredFiles) async {
     '',
     '=================================',
     '',
-    'Files with Low Coverage:',
+    lowCoverageFiles.isNotEmpty
+        ? 'Files with Low Coverage:'
+        : "No Low Coverage files was founds",
     '',
   ];
 
@@ -80,11 +92,13 @@ Future<void> generateLowCoverageReport(List<CoveredFile> coveredFiles) async {
 
   await reportFile.writeAsString(reportLines.join('\n'));
 
-  print('Low coverage files report generated at low_coverage_files_report.txt');
+  print(
+      'Low coverage files report generated at reports/low_coverage_files_report.txt');
 }
 
 Future<void> generateErrorReport(StringBuffer errorOutput) async {
-  final reportFile = File('coverage_report.txt');
+  await ensureDirectoryExists("reports");
+  final reportFile = File('reports/coverage_report.txt');
   final reportLines = <String>[
     'Errors during tests:',
     '=============================',
@@ -112,7 +126,7 @@ Future<void> generateErrorReport(StringBuffer errorOutput) async {
       if (testInfo.length >= 3) {
         // Extract path
         currentPath = testInfo[1].split('/test/').last.split(':').first;
-        currentPath = '/test/' + currentPath;
+        currentPath = '/test/$currentPath';
 
         // Extract test name
         currentTest = testInfo.last.trim();
@@ -139,7 +153,7 @@ Future<void> generateErrorReport(StringBuffer errorOutput) async {
   await reportFile.writeAsString(reportLines.join('\n'));
 
   print(
-      'There were errors during tests, they are included in coverage_report.txt');
+      'There were errors during tests, they are included in reports/coverage_report.txt');
 }
 
 void addTestToReport(List<String> reportLines, String test, String? path,

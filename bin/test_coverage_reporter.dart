@@ -45,7 +45,7 @@ Future<void> main(List<String> arguments) async {
 
   final exitCode = await generateTestCoverageFile(outputBuffer, setFlutterPath);
 
-  if (outputBuffer.isEmpty) {
+  if (outputBuffer.isEmpty && exitCode == 0) {
     final includeFiles = argResults['include-file'] as List<String>;
     final includeFolders = argResults['include-folder'] as List<String>;
     final includeFilePatterns = argResults['include-pattern'] as List<String>;
@@ -58,7 +58,7 @@ Future<void> main(List<String> arguments) async {
 
     // Now use settings in your coverage reporting logic
     await runCoverageReport(settings);
-  } else {
+  } else if (outputBuffer.isNotEmpty) {
     await generateErrorReport(outputBuffer);
   }
 }

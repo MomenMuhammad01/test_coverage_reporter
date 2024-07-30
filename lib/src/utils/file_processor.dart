@@ -7,28 +7,50 @@ import 'coverage_settings.dart';
 import 'coverage_statistics.dart';
 
 Future<int> generateTestCoverageFile(
-    StringBuffer outputBuffer, List<String>? flutterPath) async {
-  final testProcess = await Process.start(flutterPath?[0] ?? 'flutter',
-      ['test', '--coverage', '--dart-define=test=true']);
-
-  // Use a Completer to wait for both streams to complete
-  final completer = Completer<void>();
-
-  testProcess.stdout.transform(utf8.decoder).listen((data) {
-    if (data.contains('[E]') ||
-        data.contains('Expected:') ||
-        data.contains('Actual:')) {
-      outputBuffer.write(data);
+  StringBuffer outputBuffer,
+  List<String>? flutterPath,
+) async {
+  String getFlutterPath() {
+    if (flutterPath != null && flutterPath.isNotEmpty) {
+      return flutterPath.first;
+    } else {
+      return 'flutter';
     }
-  }, onDone: () {
-    completer.complete();
-  });
+  }
 
-  // Wait for both streams to complete
-  await completer.future;
+  final flutterExecutable = getFlutterPath();
+  try {
+    final testProcess = await Process.start(
+      flutterExecutable,
+      ['test', '--coverage', '--dart-define=test=true'],
+    );
 
-  final exitCode = await testProcess.exitCode;
-  return exitCode;
+    // Use a Completer to wait for both streams to complete
+    final completer = Completer<void>();
+
+    testProcess.stdout.transform(utf8.decoder).listen((data) {
+      if (data.contains('[E]') ||
+          data.contains('Expected:') ||
+          data.contains('Actual:')) {
+        outputBuffer.write(data);
+      }
+    }, onDone: () {
+      completer.complete();
+    });
+
+    testProcess.stderr.transform(utf8.decoder).listen((data) {
+      outputBuffer.write(data);
+    });
+
+    // Wait for both streams to complete
+    await completer.future;
+
+    final exitCode = await testProcess.exitCode;
+    return exitCode;
+  } catch (e) {
+    print('Error starting flutter test process: $e\n');
+    return -1;
+  }
 }
 
 Future<List<CoveredFile>> processCoverageFile(File coverageFile,
