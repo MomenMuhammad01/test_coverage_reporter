@@ -1,2 +1,6 @@
 Errors during tests:
 =============================
+Test : 00:00 +0 -1: calculate [E]
+Expected: <12>
+Actual: <42>
+=============================

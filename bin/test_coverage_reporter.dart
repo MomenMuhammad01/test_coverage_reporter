@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:args/args.dart';
 import 'package:test_coverage_reporter/test_coverage_reporter.dart';
 
@@ -55,10 +57,14 @@ Future<void> main(List<String> arguments) async {
       includeFolders: includeFolders,
     );
     settings.setIncludeFilePatterns(includeFilePatterns);
-
     // Now use settings in your coverage reporting logic
     await runCoverageReport(settings);
+    exit(0);
   } else if (outputBuffer.isNotEmpty) {
     await generateErrorReport(outputBuffer);
+    exit(1);
+  } else {
+    print("UnExpected Error Occurred");
+    exit(2);
   }
 }
