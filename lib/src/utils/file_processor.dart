@@ -49,44 +49,51 @@ Future<int> generateTestCoverageFile(
     return exitCode;
   } catch (e) {
     print('Error starting flutter test process: $e\n');
-    return -1;
+    exitCode = 1; // Set exit code to 1 for errors in test process
+    return exitCode;
   }
 }
 
 Future<List<CoveredFile>> processCoverageFile(File coverageFile,
     CoverageSettings settings, CoverageStatistics stats) async {
-  final lines = await coverageFile.readAsLines();
-  final filteredLines = filterCoverageLines(lines, settings);
+  try {
+    final lines = await coverageFile.readAsLines();
+    final filteredLines = filterCoverageLines(lines, settings);
 
-  final coveredFiles = <CoveredFile>[];
-  String? currentFile;
-  int fileLines = 0;
-  int fileCoveredLines = 0;
+    final coveredFiles = <CoveredFile>[];
+    String? currentFile;
+    int fileLines = 0;
+    int fileCoveredLines = 0;
 
-  for (final line in filteredLines) {
-    if (line.startsWith('SF:')) {
-      if (currentFile != null) {
-        processCoveredFile(
-            currentFile, fileLines, fileCoveredLines, coveredFiles, stats);
-      }
-      currentFile = line.substring(3);
-      fileLines = 0;
-      fileCoveredLines = 0;
-    } else if (line.startsWith('LF:')) {
-      fileLines = int.parse(line.substring(3));
-    } else if (line.startsWith('LH:')) {
-      fileCoveredLines = int.parse(line.substring(3));
-      if (currentFile != null) {
-        processCoveredFile(
-            currentFile, fileLines, fileCoveredLines, coveredFiles, stats);
-        currentFile = null;
+    for (final line in filteredLines) {
+      if (line.startsWith('SF:')) {
+        if (currentFile != null) {
+          processCoveredFile(
+              currentFile, fileLines, fileCoveredLines, coveredFiles, stats);
+        }
+        currentFile = line.substring(3);
         fileLines = 0;
         fileCoveredLines = 0;
+      } else if (line.startsWith('LF:')) {
+        fileLines = int.parse(line.substring(3));
+      } else if (line.startsWith('LH:')) {
+        fileCoveredLines = int.parse(line.substring(3));
+        if (currentFile != null) {
+          processCoveredFile(
+              currentFile, fileLines, fileCoveredLines, coveredFiles, stats);
+          currentFile = null;
+          fileLines = 0;
+          fileCoveredLines = 0;
+        }
       }
     }
-  }
 
-  return coveredFiles;
+    return coveredFiles;
+  } catch (e) {
+    print('Error processing coverage file: $e');
+    exitCode = 1; // Set exit code to 1 for errors in processing coverage file
+    return [];
+  }
 }
 
 List<String> filterCoverageLines(
@@ -94,37 +101,49 @@ List<String> filterCoverageLines(
   CoverageSettings settings,
 ) {
   final includedFiles = <String>[];
-  return lines.where((line) {
-    if (line.startsWith('SF:')) {
-      final filePath = line.substring(3);
-      if (settings.includeFilePatterns
-              .any((pattern) => filePath.endsWith(pattern)) ||
-          settings.includeFolders.any((folder) => filePath.contains(folder)) ||
-          settings.includeFiles.contains(filePath)) {
-        includedFiles.add(filePath);
-        return true;
+  try {
+    return lines.where((line) {
+      if (line.startsWith('SF:')) {
+        final filePath = line.substring(3);
+        if (settings.includeFilePatterns
+                .any((pattern) => filePath.endsWith(pattern)) ||
+            settings.includeFolders
+                .any((folder) => filePath.contains(folder)) ||
+            settings.includeFiles.contains(filePath)) {
+          includedFiles.add(filePath);
+          return true;
+        }
+        return false;
       }
-      return false;
-    }
-    return true;
-  }).toList();
+      return true;
+    }).toList();
+  } catch (e) {
+    print('Error filtering coverage lines: $e');
+    exitCode = 1; // Set exit code to 1 for errors in filtering lines
+    return [];
+  }
 }
 
 void processCoveredFile(String filePath, int lines, int coveredLines,
     List<CoveredFile> coveredFiles, CoverageStatistics stats) {
-  final coveragePercentage = lines > 0 ? (coveredLines / lines) * 100 : 0.0;
+  try {
+    final coveragePercentage = lines > 0 ? (coveredLines / lines) * 100 : 0.0;
 
-  final coveredFile = CoveredFile(
-    filePath: filePath,
-    totalLines: lines,
-    coveredLines: coveredLines,
-    coverage: coveragePercentage,
-  );
+    final coveredFile = CoveredFile(
+      filePath: filePath,
+      totalLines: lines,
+      coveredLines: coveredLines,
+      coverage: coveragePercentage,
+    );
 
-  coveredFiles.add(coveredFile);
-  stats.totalLines += lines;
-  stats.totalCoveredLines += coveredLines;
-  if (coveredLines == lines && lines > 0) {
-    stats.totalFilesWithFullCoverage++;
+    coveredFiles.add(coveredFile);
+    stats.totalLines += lines;
+    stats.totalCoveredLines += coveredLines;
+    if (coveredLines == lines && lines > 0) {
+      stats.totalFilesWithFullCoverage++;
+    }
+  } catch (e) {
+    print('Error processing covered file: $e');
+    exitCode = 1; // Set exit code to 1 for errors in processing covered file
   }
 }

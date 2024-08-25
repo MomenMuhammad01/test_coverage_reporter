@@ -5,4 +5,4 @@ Total Low Coverage Files: 0
 
 =================================
 
-No Low Coverage files was founds
+No Low Coverage files were found
