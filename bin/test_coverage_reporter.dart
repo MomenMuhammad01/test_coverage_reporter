@@ -62,5 +62,6 @@ Future<void> main(List<String> arguments) async {
     exit(0);
   } else if (outputBuffer.isNotEmpty) {
     await generateErrorReport(outputBuffer);
+    exit(1);
   }
 }

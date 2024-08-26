@@ -1,15 +1,6 @@
-Test Coverage Report
-======================
-
-Total Coverage: 100.00%
-Total Covered Files: 1
-Total Files with 100% coverage: 1
-
-======================
-
-Coverage by File:
-
-File Path: lib/example_usecase.dart
-Coverage: 100.00%
-
-======================
+Errors during tests:
+=============================
+Test : 00:01 +0 -1: calculate [E]
+Expected: <41>
+Actual: <42>
+=============================
