@@ -49,8 +49,7 @@ Future<int> generateTestCoverageFile(
     return exitCode;
   } catch (e) {
     print('Error starting flutter test process: $e\n');
-    exitCode = 1; // Set exit code to 1 for errors in test process
-    return exitCode;
+    exit(1);
   }
 }
 
@@ -91,8 +90,7 @@ Future<List<CoveredFile>> processCoverageFile(File coverageFile,
     return coveredFiles;
   } catch (e) {
     print('Error processing coverage file: $e');
-    exitCode = 1; // Set exit code to 1 for errors in processing coverage file
-    return [];
+    exit(1);
   }
 }
 
@@ -119,8 +117,7 @@ List<String> filterCoverageLines(
     }).toList();
   } catch (e) {
     print('Error filtering coverage lines: $e');
-    exitCode = 1; // Set exit code to 1 for errors in filtering lines
-    return [];
+    exit(1);
   }
 }
 
@@ -144,6 +141,6 @@ void processCoveredFile(String filePath, int lines, int coveredLines,
     }
   } catch (e) {
     print('Error processing covered file: $e');
-    exitCode = 1; // Set exit code to 1 for errors in processing covered file
+    exit(1);
   }
 }
