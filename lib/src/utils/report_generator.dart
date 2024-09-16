@@ -26,7 +26,7 @@ Future<void> runCoverageReport(CoverageSettings settings) async {
     await generateLowCoverageReport(coveredFiles);
   } catch (e) {
     print('Error generating coverage report: $e');
-    exitCode = 1; // Set exit code to 1 for errors in report generation
+    exit(1);
   }
 }
 
@@ -67,7 +67,7 @@ Future<void> generateCoverageReport(
     print('Coverage report generated at reports/coverage_report.txt');
   } catch (e) {
     print('Error generating coverage report: $e');
-    exitCode = 1; // Set exit code to 1 for errors in report generation
+    exit(1);
   }
 }
 
@@ -102,8 +102,7 @@ Future<void> generateLowCoverageReport(List<CoveredFile> coveredFiles) async {
         'Low coverage files report generated at reports/low_coverage_files_report.txt');
   } catch (e) {
     print('Error generating low coverage report: $e');
-    exitCode =
-        1; // Set exit code to 1 for errors in low coverage report generation
+    exit(1);
   }
 }
 
@@ -168,7 +167,7 @@ Future<void> generateErrorReport(StringBuffer errorOutput) async {
         'There were errors during tests, they are included in reports/coverage_report.txt');
   } catch (e) {
     print('Error generating error report: $e');
-    exitCode = 1; // Set exit code to 1 for errors in error report generation
+    exit(1);
   }
 }
 
